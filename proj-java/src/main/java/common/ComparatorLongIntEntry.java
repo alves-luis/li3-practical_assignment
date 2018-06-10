@@ -3,7 +3,7 @@ package common;
 import java.util.Map;
 
 /**
-  * Comparator of Map.Entries of <Long,Integer>
+  * Comparator of Map.Entries of <Long,Integer> (second order is lowest ID first)
   *
   * @author Luís Alves
   * @version 2018-05-23

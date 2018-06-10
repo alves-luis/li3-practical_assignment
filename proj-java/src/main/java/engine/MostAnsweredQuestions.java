@@ -2,7 +2,7 @@ package engine;
 
 import java.util.stream.Collectors;
 import java.util.List;
-import li3.Answer;
+import li3.Question;
 import common.ComparatorLongIntEntryReverseInt;
 import java.util.Comparator;
 import java.util.Map;
@@ -13,13 +13,15 @@ import java.util.HashMap;
 public class MostAnsweredQuestions {
   /**
     * @param N size
-    * @param questions Id of questions
-    * @param answers map of question id, to answer
+    * @param begin LocalDate that begins
+    * @param end LocalDate of ending
   */
-  public static List<Long> mostAnsweredQuestions(int N,List<Long> questions, Map<Long,Set<Answer>> answers) {
+  public static List<Long> mostAnsweredQuestions(int N, LocalDate begin, LocalDate end, Community com) {
+    List<Question> questions = com.filterQuestionByInterval(begin,end);
     HashMap<Long,Integer> result = new HashMap<>();
-    for(Long questionID : questions) {
-      result.put(questionID,answers.get(questionID).size());
+    for(Question question : questions) {
+      Long questionID = question.getId();
+      result.put(questionID,com.getAnswerCount(questionID));
     }
     return result.entrySet().stream()
     .sorted(new ComparatorLongIntEntryReverseInt())

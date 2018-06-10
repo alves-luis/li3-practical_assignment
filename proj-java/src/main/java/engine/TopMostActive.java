@@ -7,10 +7,10 @@ import li3.User;
 public class TopMostActive {
   /**
     * @param N size of most active
-    * @param users List of users by number of posts
+    * @param com Community
   */
-  public static List<Long> topMostActive(int N, List<User> users) {
-    return users.stream()
+  public static List<Long> topMostActive(int N, Community com) {
+    return com.getUsersByNumberOfPosts().stream()
     .limit(N)
     .mapToLong(User::getId)
     .boxed()

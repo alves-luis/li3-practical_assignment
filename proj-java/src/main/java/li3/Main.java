@@ -45,10 +45,10 @@ public class Main {
            Query 1
         */
         before = System.currentTimeMillis();
-        Pair<String,String> q1 = qe.infoFromPost(801049);
+        Pair<String,String> q1 = qe.infoFromPost(796430);
         after = System.currentTimeMillis();
         logtime.writeLog("Query 1: -> "+(after-before)+" ms");
-        log.writeLog("Query1 -> " + q1);
+        log.writeLog("Query 1 -> " + q1);
 
         /*
            Query 2
@@ -83,7 +83,7 @@ public class Main {
            Query 5
         */
         before = System.currentTimeMillis();
-        Pair<String, List<Long>> q5 = qe.getUserInfo(15811);
+        Pair<String, List<Long>> q5 = qe.getUserInfo(449);
         after = System.currentTimeMillis();
         logtime.writeLog("Query 5 -> "+(after-before)+" ms");
         log.writeLog("Query 5 -> "+q5);
@@ -92,18 +92,18 @@ public class Main {
            Query 6
         */
         before = System.currentTimeMillis();
-        List<Long> q6 = qe.mostVotedAnswers(5, LocalDate.of(2015, Month.NOVEMBER, 1),
-                LocalDate.of(2015, Month.NOVEMBER,30));
+        List<Long> q6 = qe.mostVotedAnswers(50, LocalDate.of(2013, Month.MAY, 1),
+                LocalDate.of(2013, Month.MAY,6));
         after = System.currentTimeMillis();
-        logtime.writeLog("Query6 -> " + (after - before) + " ms");
-        log.writeLog("Query6 -> " + q6);
+        logtime.writeLog("Query 6 -> " + (after - before) + " ms");
+        log.writeLog("Query 6 -> " + q6);
 
         /*
            Query 7
         */
         before = System.currentTimeMillis();
-        List<Long> q7 = qe.mostAnsweredQuestions(10, LocalDate.of(2014,Month.AUGUST,1),
-                LocalDate.of(2014,Month.AUGUST,11));
+        List<Long> q7 = qe.mostAnsweredQuestions(100, LocalDate.of(2012,Month.JANUARY,1),
+                LocalDate.of(2012,Month.DECEMBER,31));
         after = System.currentTimeMillis();
         logtime.writeLog("Query 7 -> "+(after-before)+" ms");
         log.writeLog("Query 7 -> "+q7);
@@ -121,7 +121,7 @@ public class Main {
            Query 9
         */
         before = System.currentTimeMillis();
-        List<Long> q9 = qe.bothParticipated(10, 87, 5691);
+        List<Long> q9 = qe.bothParticipated(5, 253, 455);
         after = System.currentTimeMillis();
         logtime.writeLog("Query9 -> " + (after - before) + " ms");
         log.writeLog("Query 9 -> " + q9);
@@ -130,7 +130,7 @@ public class Main {
            Query 10
         */
         before = System.currentTimeMillis();
-        long q10 = qe.betterAnswer(30334);
+        long q10 = qe.betterAnswer(5942);
         after = System.currentTimeMillis();
         logtime.writeLog("Query 10 -> "+(after-before)+" ms");
         log.writeLog("Query 10 -> "+q10);

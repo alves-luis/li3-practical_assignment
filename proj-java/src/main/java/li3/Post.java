@@ -1,6 +1,5 @@
 package li3;
 
-import exceptions.PostDoesNotHaveTitleException;
 import li3.Identifiable;
 /**
  * Post
@@ -37,21 +36,17 @@ public class Post implements Comparable<Post>, Identifiable {
     }
 
     public Post(Post p) {
-      String tempTitle;
-      try {
-        title = p.getTitle();
-      }
-      catch (PostDoesNotHaveTitleException e) {
-        title = null;
-      }
+      title = p.getTitle();
       id = p.getId();
       creationDate = p.getCreationDate();
       creatorId = p.getCreatorId();
     }
 
-    public String getTitle() throws PostDoesNotHaveTitleException {
-      if (title == null) throw new PostDoesNotHaveTitleException(String.valueOf(id));
-      else return title;
+    /**
+      * @return Title (can be null)
+    */
+    public String getTitle() {
+      return title;
     }
 
     public long getId() {
@@ -103,14 +98,10 @@ public class Post implements Comparable<Post>, Identifiable {
         return false;
       Post p = (Post) o;
       boolean titleBool = true;
-      try {
-        String pTitle = p.getTitle();
-        if (this.title == null) titleBool = false;
-        else titleBool = title.equals(pTitle);
-      }
-      catch (PostDoesNotHaveTitleException e) {
-        titleBool = this.title == null;
-      }
+      String pTitle = p.getTitle();
+      if (this.title == null) titleBool = false;
+      else titleBool = title.equals(pTitle);
+
       return this.id == p.getId() && titleBool &&
              this.creationDate.equals(p.getCreationDate()) &&
              this.creatorId == p.getCreatorId();

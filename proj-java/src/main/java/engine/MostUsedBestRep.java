@@ -16,15 +16,22 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Comparator;
+import java.time.LocalDate;
+import exceptions.UserDoesNotExistException;
 
 public class MostUsedBestRep {
 
-  private static List<User> usersThatParticipated(int N, Map<Long,User> users, Set<Post> posts) {
+  private static List<User> usersThatParticipated(int N, Community com , Set<Post> posts) {
     ArrayList<User> usersThatParticipated = new ArrayList<>();
     for(Post p : posts) {
       long id = p.getCreatorId();
-      User participated = users.get(id);
-      usersThatParticipated.add(participated);
+      try {
+        User participated = com.getUserById(id);
+        usersThatParticipated.add(participated);
+      }
+      catch (UserDoesNotExistException e) {
+        continue;
+      }
     }
     usersThatParticipated.sort(new ComparatorUserReputation());
     return usersThatParticipated.subList(0,N);
@@ -32,20 +39,23 @@ public class MostUsedBestRep {
 
   /**
     * @param N size of most active
-    * @param users List of users by number of posts
+    * @param begin Starting date
+    * @param end Ending date
+    * @param com Community
   */
-  public static List<Long> mostUsedBestRep(int N, Map<String,Tag> tags,Map<Long,User> users, Set<Post> posts, Map<Long,Set<Post>> postsByUser, Map<Long,Post> postsById) {
-    List<User> finalListOfUsers = usersThatParticipated(N,users,posts);
+  public static List<Long> mostUsedBestRep(int N, LocalDate begin, LocalDate end, Community com) {
+    Set<Post> posts = com.filterPostsByInterval(begin,end);
+    List<User> finalListOfUsers = usersThatParticipated(N,com,posts);
     HashMap<Long,Integer> timesTagUsedById = new HashMap<>();
     for (User u : finalListOfUsers) {
-      Set<Post> postsOfUser = postsByUser.get(u.getId());
+      Set<Post> postsOfUser = com.getPostsOfUser(u.getId());
       for(Post p : postsOfUser) {
         if (posts.contains(p)) {
           if (p instanceof Question) {
             Question q = (Question) p;
             List<String> usedTags = q.getTags();
             for (String s : usedTags) {
-              Long tagId = tags.get(s).getId();
+              Long tagId = com.getTagId(s);
               int count = 0;
               if (!timesTagUsedById.containsKey(tagId))
                 timesTagUsedById.put(tagId,1);
