@@ -1,0 +1,114 @@
+\documentclass[a4paper]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[portuges]{babel}
+\usepackage{graphicx}
+\usepackage[colorlinks = true, urlcolor = blue]{hyperref}
+\usepackage{tabto}
+\usepackage{hyperref}
+\hypersetup{colorlinks = true, linkcolor  = black}
+
+\begin{document}
+
+\title{Relatório do Trabalho Prático de LI3}
+\author{Grupo 42\\
+\\
+João Queirós A82422\\
+\\
+José Costa A82136\\
+\\
+Luís Alves A80165\\
+\\
+Miguel Carvalho A81909}
+\date{\today}
+
+\maketitle
+\tableofcontents
+
+\chapter{Introdução}
+
+	\section{Contextualização}
+		\tab Este projeto foi desenvolvido no âmbito da Unidade Curricular de \textit{Laboratórios de Informática III}, no qual analisaremos e processaremos informação do \href{https://pt.stackoverflow.com}{\textit{\textbf{Stack Overflow}}}, que nos permitirá criar funções...
+
+	\section{Objetivos}
+		\tab Ao longo do semestre, a realização deste projeto levará a um reforço de competências ganhas em unidades curriculares de semestres anteriores, como \textit{Programação Imperativa}, \textit{Arquitetura de Computadores} e \textit{Algoritmos e Complexidade}, assim como a sedimentação dos conhecimentos adquiridos em \textit{Programação Orientada aos Objetos}, aplicando-os na construção de um trabalho concreto, aumentando as nossas capacidades de comunicação e trabalho em grupo. Através da utilização de um sistema de controlo de versões, \href{https://github.com}{\textit{\textbf{GitHub}}}, fomos deste modo incentivados a criar boas práticas de trabalho.
+
+\chapter{Abordagem Inicial}
+	\section{Estruturas de Dados}
+		\tab Inicialmente, a preocupação do grupo centrou-se na implementação de estruturas para alocar os dados de uma forma eficiente, de modo a permitir um rentável processamento dos mesmos.\par
+		A nossa primeira abordagem consistiu em implementar uma \textit{AVL Tree}, por ser uma estrutura ordenada e eficiente em termos assintóticos para o tratamento dos dados. No entanto, devido a uma melhor API, assim como um tempo de execução inferior dadas as circunstâncias, decidimos alterar a estrutura para uma \textit{Sequence}. Esta contém os Posts ordenados pela sua data (por ordem crecente) de modo a permitir uma procura eficiente. \par
+		Implementamos também uma \textit{Hash Table}, deste modo é possível utilizar a Hash para uma procura rápida de um post específico por ID, e a Sequence para aplicar uma ou mais funções a um bloco de Posts.\par
+		Por último, criamos ainda uma \textit{Heap} que serve para guardar os Users, sendo que estes são guardados em duas Heaps ordenadas de forma diferente,  uma delas ordenada pela reputação, e a outra pelo número de posts (ambas ordenadas por ordem decrescente).
+
+	\section{Parsing}
+		\tab O nosso \textit{parsing} consistiu em colocar os Posts numa Hash Table, assim como numa \textit{Sequence}.As Tags são também colocadas numa Hash Table, bem como os Users, estes posteriormente colocados em duas heaps, uma delas ordenada pela reputação, e a outra pelo número de posts (ambas ordenadas por ordem decrescente).\par
+
+\chapter{Dados}
+	\section{Abstração}
+		\tab Após ser feito o \textit{parsing}, era necessário criar vários tipos abstratos de dados que contivessem a informação recebida dos ficheiros. \par
+	Assim sendo, recorremos ao \href{https://developer.gnome.org/glib/}{\textit{\textbf{GLib}}}, onde encontramos implementações gerais de \textit{structs}, que ao longo do projeto concretizamos para satisfazerem a resolução dos problemas propostos. \par
+	Além deste suporte, também na implementação do código se encontram funções que se generalizam para várias estruturas, nomeadamente as que têm como parâmetro um apontador, ou seja, existe a possibilidade da função invocar qualquer estrutura implementada no projeto.
+
+	\section{Modularização}
+		\tab Para aplicar modularização funcional ao projeto desenvolvido foi decidido em conformidade criar um ficheiro para cada estrutura de dados (isto é, foi implementada uma \textit{Hash Table} no ficheiro \verb+hash.c+, uma \textit{Heap} no ficheiro \verb+heap.c+, etc). Posteriormente, foi ainda feito um \textit{union} no ficheiro \verb+post.c+, que separa para o ficheiro \verb+question.c+ os \textit{posts} que são perguntas e para \verb+answer.c+ os que são respostas. \par
+	Todos estes ficheiros são incluídos no header de \verb+interface.c+, ficheiro esse onde se encontram implementadas todas as \textit{queries} propostas e, logicamente, usando todas as estruturas que foram importadas.
+
+\chapter{Queries}
+	\section{Query 1}
+	\tab São invocadas as funções \verb+tad_getPostsByHash+ e \verb+tad_getUsersByHash+ para colocar, respetivamente, posts e utilizadores numa \textit{Hash Table}, sendo em seguida verificada a existência do post.\par
+	Caso se trate de uma pergunta, encontra-se o ID do criador da mesma \\(\verb+post_getCreatorID+), que é posteriormente pesquisado na \textit{Hash Table} de utilizadores. Por fim, é criado o par de \textit{strings} que devolverá o título e nome de utilizador do autor do \textit{post}.\par
+	 A estratégia caso o post se trate de uma resposta é obter a pergunta onde está inserida a mesma (através de \verb+post_getParent+). Daí em diante, o processo é análogo ao feito com as perguntas.
+
+	\section{Query 2}
+	 \tab Os utlizadores são guardados numa \textit{Heap} ordenada pelo número de \textit{posts} feitos. É-lhe feito um \textit{clone} que aplica uma cópia de bloco de memória (\verb+memcpy+) para se ajustar ao tamanho dos utilizadores.\par
+	 Para correr o ciclo que passa pelos N utilizadores mais ativos é calculada a variável \verb+maxSize+ que, claro está, será o tamanho da lista de utilizadores devolvida. Lista essa que é gerada retirando ordenadamente da \textit{Heap} cada utilizador, encontrando o seu ID e inserindo-o por fim na lista referida. Após todas as iterações é libertado o espaço ocupado pela \textit{Heap} através da função \verb+heap_free+.
+
+	\section{Query 3}
+		\tab Nesta Query, inicialmente havíamos pensado em implementar uma estratégia
+		que minimizasse o uso de computações específicas à query dentro da classe \textit{Community}.
+		Assim sendo, optamos por opter a lista de Posts dentro de um intervalo e, posteriormente,
+		iterá-la e contar se eram instâncias de Pergunta, ou de Resposta. No entanto, isto implicava
+		que percorressemos essa Lista de Posts mais que uma vez. Optamos por outra abordagem, que se enuncia de seguida.
+		\par Considerando o valor obtido de execução demasiado elevado, optamos por, ao coletar os Posts dentro
+		de um intervalo, contar de imediato se eram uma Pergunta, ou uma Resposta. Verificou-se um aumento
+		de performance na ordem das 4 vezes (análise mais detalhada na secção \ref{ch:otimizacao}).
+		\par Apesar de esta computação se realizar no objeto \textit{Community}, em termos arquiteturais faz sentido,
+		pelo que mantivemos esta abordagem tanto pela performance, como pela coerência arquitetural.
+
+	\section{Query 4} -M
+	\tab Os posts são guardados numa \textit{Hash Table}. Utilizamos a função  \verb+seq_inBetweenDates+ que vai aplicar uma função a todos os posts da Hash entre as duas datas. A função vai inserir os posts dinamicamente numa lista caso estes sejam perguntas e contenham a tag fornecida. No final de todos os posts serem inseridos,  o espaço não ocupado é libertado e a lista é invertida.
+
+	\section{Query 5}
+	\tab Tal como na  \textbf{Query 1}, é guardada a informação dos utilizadores numa \textit{Hash Table}, que é usada para obter a informação do utilizador com o ID invocado como argumento. \par
+	Testado o caso em que o utilizador não existe, através das funções\\ \verb+long_user_get10LastPosts+ e \verb+long_user_getBio+ (ambas recebem um utilizador) é obtido o perfil e os ID's dos seus dez últimos posts, do mais recente para o mais antigo.\par
+	É, então, criado um utilizador com as informações mencionadas (através da função \verb+create_user+) que é devolvido como resultado da Query.
+
+	\section{Query 6}
+	\tab Chama a função \verb+seq_inBetweenDates+ que vai aplicar uma função a todos os posts entre as datas e  se fôr uma resposta coloca o seu ID, se possível, ordenadamente numa lista de tamanho fixo N (ordenadas decrescentemente pelo número de votos).
+
+	\section{Query 7} -M
+	\tab Chama a função \verb+seq_inBetweenDates+ que vai aplicar uma função a todos os posts entre as datas e  se fôr uma pergunta coloca o seu ID, se possível, ordenadamente numa lista de tamanho fixo N (ordenadas decrescentemente pelo número de respostas).
+
+	\section{Query 8}
+	\tab Para esta \textbf{Query} foi implementada uma função auxiliar que verifica se uma determinada palavra está presente no título de um post. \par
+	A estratégia usada para resolver a questão foi colocar os dados num  \textit{Array Pointer} de tamanho 2, guardando apontadores de uma \textit{Sequence} no primeiro e da palavra a ser testada. Em seguida, são percorridos os posts numa \textit{Hash table} para colocar ordenadamente na \textit{Sequence} os que contêm a palavra procurada. \par
+	É, então, inicializado um \textit{Array} que, através da função \verb+seq_getNFirstPost+, passa a ter o mesmo conteúdo da \textit{Sequence} descrita anteriormente. Por fim, é feito um ciclo para criar a lista a ser devolvida (a partir do \textit{Array}) e liberta-se o espaço das estruturas geradas.
+
+	\section{Query 9}
+	\tab As funções auxiliares desta \textbf{Query} (\verb+both_participated_addPostsToHash+ e \verb+both_participated_addCommonToSeq+) são usadas para adicionar ID's de \textit{Posts} a uma \textit{Hash table} ou a uma \textit{Sequence}, enquanto que a função \\
+\verb+both_participated_cleanMemory+ liberta o espaço de todas as estruturas usadas na função principal. \par
+	Na referida função principal são encontrados os utilizadores segundo os ID's que são passados como parâmetros da mesma. Testadas as suas existências, é colocada numa  \textit{Hash table} os \textit{Posts} do primeiro utilizador e em duas \textit{Sequence} os N primeiros ID's de posts dos dois utilizadores. Com a primeira função auxiliar, coloca-se numa outra \textit{Hash table} os ID's de posts do Utilizador 1. Logo após invoca-se a função \verb+both_participated_addCommonToSeq+ descrita acima, que encontra o ID de um \textit{Post} e acrescenta-o à \textit{Sequence} se o mesmo ainda não se encontrar nela e estiver na \textit{Hash table} do Utilizador 1. \par
+	Por fim, é utilizado o mesmo processo final da \textbf{Query 8} que gera a lista a partir da \textit{Sequence} que contém os ID's de todos os \textit{Posts} onde ambos os utilizadores participaram.
+
+	\section{Query 10}
+	\tab É encontrado o \textit{Post} procurando numa \textit{Hash table} o ID da pergunta. São então percorridas todas as respostas à pergunta e, para cada uma delas, é calculado o seu \textit{score}. Através de um algoritmo de cálculo de elemento máximo, é colocado na variável a ser devolvida pela função o ID da resposta.
+
+	\section{Query 11}
+	\tab Retiramos da heap dos users os N melhores qualificados e colocamo-los numa lista. Chamamos a função \verb+seq_inBetweenDates+  que aplica uma função a cada post entre as datas recebidas. A função verifica se o post pertence a um dos N utilizadores e caso pertença aplica uma outra função ás tags que a associa ao seu ID e insere-o numa Hash que, a cada ID(key) associa um contador, e caso o ID já exista, incrementa o contador da respetiva tag. Finalmente, percorremos a hash e inserimo-los por ordem decrescente de aparências na lista a retornar.
+
+\chapter{Estratégias de otimização}\label{ch:otimizacao}
+	\tab Não foi utilizada nenhuma API para melhorar e influenciar os tempos de execução das \textit{Queries} (como por exemplo o \href{http://www.openmp.org/}{\textit{\textbf{OpenMP}}}. \par
+	Desde cedo que o grupo se focou em criar estruturas de dados com complexidade linear ou logarítmica(\textit{Hash tables} e \textit{AVL Trees}) de modo a manter sempre um bom desempenho na execução das funções criadas. Beneficiamos também das implementações já construídas fornecidas pelo \href{https://developer.gnome.org/glib/}{\textit{\textbf{GLib}}} (como foi dito anteriormente) que contribuíram para a implementação de todo o código com um desempenho considerável.
+	Deste modo, toda a otimização feita pelo grupo baseou-se em gerir o código da maneira mais limpa possível, como retirando qualquer tipo de \textit{"ciclos encavalitados"} que geram complexidades polinomiais e evitando a cópia de conteúdo, ou seja, trabalhando sobretudo com \textit{pointers}.
+
+\end{document}
