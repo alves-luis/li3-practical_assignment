@@ -10,8 +10,7 @@ public class TopMostActive {
     * @param com Community
   */
   public static List<Long> topMostActive(int N, Community com) {
-    return com.getUsersByNumberOfPosts().stream()
-    .limit(N)
+    return com.getUsersByNumberOfPosts(N).stream()
     .mapToLong(User::getId)
     .boxed()
     .collect(Collectors.toList());

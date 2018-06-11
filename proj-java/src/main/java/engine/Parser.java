@@ -5,7 +5,7 @@ import li3.*;
 /**
  * Escreva a descrição da classe Parser aqui.
  *
- * @author (seu nome)
+ * @author Grupo 42
  * @version 2018-05-23
  */
 
@@ -40,7 +40,9 @@ public class Parser {
               Question p = new Question(title,id,date,creatorId);
               String notParsedTags = reader.getAttributeValue(null,"Tags");
               List<String> listOfTags = Parser.trimTags(notParsedTags);
+              int answerCount = Integer.parseInt(reader.getAttributeValue(null,"AnswerCount"));
               p.addTags(listOfTags);
+              p.setAnswerCount(answerCount);
               result.add(p);
             }
             else if (postType == 2) {

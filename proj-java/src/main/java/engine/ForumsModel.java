@@ -1,25 +1,17 @@
 package engine;
 
-import common.*;
-import li3.*;
-import exceptions.*;
-
-import java.time.LocalDate;
-import java.time.Month;
+import common.Pair;
+import li3.TADCommunity;
 
 /**
- * Model in MVC
+ * Class that implements TADCommunity
  *
- * @author (seu nome)
+ * @author Grupo 42
  * @version 2018-05-23
  */
-import java.util.Map;
-import java.util.Set;
-import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.Month;
 
 public class ForumsModel implements TADCommunity {
 

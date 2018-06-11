@@ -20,8 +20,9 @@ public class MostAnsweredQuestions {
     List<Question> questions = com.filterQuestionByInterval(begin,end);
     HashMap<Long,Integer> result = new HashMap<>();
     for(Question question : questions) {
-      Long questionID = question.getId();
-      result.put(questionID,com.getAnswerCount(questionID));
+      long questionID = question.getId();
+      int count = question.getAnswerCount();
+      result.put(questionID,count);
     }
     return result.entrySet().stream()
     .sorted(new ComparatorLongIntEntryReverseInt())

@@ -17,24 +17,37 @@ public class Question extends Post {
 
   /** List with Tags */
   private List<String> tags;
+  /** AnswerCount */
+  private int answerCount;
 
   public Question() {
     tags = new ArrayList<String>();
+    answerCount = 0;
   }
 
   public Question(String title,long id,LocalDateTime date,long creatorId) {
     super(title,id,date,creatorId);
     tags = new ArrayList<String>();
+    answerCount = 0;
   }
 
   public Question(Question q) {
     super(q);
     tags = q.getTags();
+    answerCount = q.getAnswerCount();
   }
 
   public List<String> getTags() {
     return this.tags.stream()
     .collect(Collectors.toList());
+  }
+
+  public int getAnswerCount() {
+    return this.answerCount;
+  }
+
+  public void setAnswerCount(int a) {
+    answerCount = a;
   }
 
   public void addTag(String t) {

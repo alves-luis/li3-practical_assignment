@@ -12,7 +12,8 @@ import common.ComparatorUserReputation;
 import common.ComparatorLongIntEntry;
 import java.util.Map;
 import java.util.Set;
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.TreeMap;
 import java.util.HashMap;
 import java.util.Comparator;
@@ -21,8 +22,8 @@ import exceptions.UserDoesNotExistException;
 
 public class MostUsedBestRep {
 
-  private static List<User> usersThatParticipated(int N, Community com , Set<Post> posts) {
-    ArrayList<User> usersThatParticipated = new ArrayList<>();
+  private static List<User> usersThatParticipated(int N, Community com , List<Question> posts) {
+    TreeSet<User> usersThatParticipated = new TreeSet<>(new ComparatorUserReputation());
     for(Post p : posts) {
       long id = p.getCreatorId();
       try {
@@ -33,8 +34,7 @@ public class MostUsedBestRep {
         continue;
       }
     }
-    usersThatParticipated.sort(new ComparatorUserReputation());
-    return usersThatParticipated.subList(0,N);
+    return usersThatParticipated.stream().limit(N).collect(Collectors.toList());
   }
 
   /**
@@ -44,19 +44,19 @@ public class MostUsedBestRep {
     * @param com Community
   */
   public static List<Long> mostUsedBestRep(int N, LocalDate begin, LocalDate end, Community com) {
-    Set<Post> posts = com.filterPostsByInterval(begin,end);
+    List<Question> posts = com.filterQuestionByInterval(begin,end);
     List<User> finalListOfUsers = usersThatParticipated(N,com,posts);
     HashMap<Long,Integer> timesTagUsedById = new HashMap<>();
     for (User u : finalListOfUsers) {
       Set<Post> postsOfUser = com.getPostsOfUser(u.getId());
       for(Post p : postsOfUser) {
-        if (posts.contains(p)) {
-          if (p instanceof Question) {
+        if (p instanceof Question) {
+          if (posts.contains(p)) {
             Question q = (Question) p;
             List<String> usedTags = q.getTags();
             for (String s : usedTags) {
               Long tagId = com.getTagId(s);
-              int count = 0;
+              int count;
               if (!timesTagUsedById.containsKey(tagId))
                 timesTagUsedById.put(tagId,1);
               else {
@@ -68,6 +68,7 @@ public class MostUsedBestRep {
         }
       }
     }
+    timesTagUsedById.entrySet().stream().sorted(new ComparatorLongIntEntry()).limit(N).forEach(en -> System.out.println(en.getKey() + "->" + en.getValue()));
     return timesTagUsedById.entrySet().stream()
     .sorted(new ComparatorLongIntEntry())
     .limit(N)

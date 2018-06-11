@@ -1,24 +1,18 @@
 package li3;
 
-import common.MyLog;
-import common.Pair;
-import engine.TCDExample;
-import engine.ForumsModel;
-import engine.*;
-import li3.*;
-import common.*;
-
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
+
+import common.MyLog;
+import common.Pair;
+import engine.ForumsModel;
 
 public class Main {
 
 
     public static void main(String[] args){
 
-       ForumsModel model = new ForumsModel();
-       ForumsController control = new ForumsController(model);
         /*
             LOG CONFIGURATION
         */
@@ -27,7 +21,7 @@ public class Main {
         /* -------------------------------------------------------------------------------------------*/
 
         long before, after;
-        TADCommunity qe = model;
+        TADCommunity qe = new ForumsModel();
 
         /*
             LOAD PHASE
@@ -54,7 +48,7 @@ public class Main {
            Query 2
         */
         before = System.currentTimeMillis();
-        List<Long> q2 = qe.topMostActive(10);
+        List<Long> q2 = qe.topMostActive(100);
         after = System.currentTimeMillis();
         logtime.writeLog("Query 2 -> "+(after-before)+" ms");
         log.writeLog("Query 2 -> "+q2);
@@ -63,8 +57,8 @@ public class Main {
            Query 3
         */
         before = System.currentTimeMillis();
-        Pair<Long,Long> q3 = qe.totalPosts(LocalDate.of(2016, Month.JULY,1),
-                LocalDate.of(2016,Month.JULY,31));
+        Pair<Long,Long> q3 = qe.totalPosts(LocalDate.of(2014, Month.JANUARY,1),
+                LocalDate.of(2014,Month.DECEMBER,31));
         after = System.currentTimeMillis();
         logtime.writeLog("Query 3 -> "+(after-before)+" ms");
         log.writeLog("Query 3 -> "+q3);
@@ -123,7 +117,7 @@ public class Main {
         before = System.currentTimeMillis();
         List<Long> q9 = qe.bothParticipated(5, 253, 455);
         after = System.currentTimeMillis();
-        logtime.writeLog("Query9 -> " + (after - before) + " ms");
+        logtime.writeLog("Query 9 -> " + (after - before) + " ms");
         log.writeLog("Query 9 -> " + q9);
 
         /*
@@ -139,8 +133,8 @@ public class Main {
             Query 11
         */
         before = System.currentTimeMillis();
-        List<Long> q11 = qe.mostUsedBestRep(10, LocalDate.of(2014,Month.JANUARY,01),
-                LocalDate.of(2014,Month.DECEMBER,31));
+        List<Long> q11 = qe.mostUsedBestRep(5, LocalDate.of(2013,Month.NOVEMBER,01),
+                LocalDate.of(2013,Month.NOVEMBER,30));
         after = System.currentTimeMillis();
         logtime.writeLog("Query 11 -> "+(after-before)+" ms");
         log.writeLog("Query 11 -> "+q11);
