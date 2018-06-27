@@ -8,12 +8,24 @@ import li3.Answer;
 import exceptions.PostDoesNotExistException;
 import exceptions.UserDoesNotExistException;
 
+/**
+ * InfoFromPost class, stands for Query 1
+ *
+ * @author Grupo 42
+ * @version 2018-06-11
+ */
 public class InfoFromPost {
+  /**
+    * @param id ID
+    * @param com Community
+    * @return Pair with the post title and author's username
+  */
   public static Pair<String,String> infoFromPost(long id, Community com) {
     try {
       Post p = com.getPost(id);
       String title = null;
       String name = null;
+      // If answers, get the question
       if (p instanceof Answer) {
         Answer a = (Answer) p;
         Question father = (Question) com.getPost(a.getParentId());

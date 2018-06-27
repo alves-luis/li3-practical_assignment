@@ -4,13 +4,13 @@ import li3.User;
 
 /**
   * Comparator of Users by Number of Posts (Mosts posts first)
+  * Then compares by id
   *
-  * @author Luís Alves
+  * @author Grupo 42
   * @version 2018-05-23
 */
 import java.util.Comparator;
 import java.time.LocalDateTime;
-import java.io.Serializable;
 
 public class ComparatorUserNumberOfPosts implements Comparator<User> {
   /**

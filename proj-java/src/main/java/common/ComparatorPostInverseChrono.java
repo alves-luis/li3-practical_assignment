@@ -5,12 +5,11 @@ import li3.Post;
 /**
   * Comparator of Posts by Date (Inverse Chronological Order)
   *
-  * @author Luís Alves
+  * @author Grupo 42
   * @version 2018-05-23
 */
 import java.util.Comparator;
 import java.time.LocalDateTime;
-import java.io.Serializable;
 
 public class ComparatorPostInverseChrono implements Comparator<Post> {
   /**

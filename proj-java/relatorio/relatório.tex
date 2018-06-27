@@ -1,0 +1,348 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[portuges]{babel}
+\usepackage{graphicx}
+\usepackage[colorlinks = true, urlcolor = blue, linkcolor = black]{hyperref}
+\usepackage{tabto}
+\usepackage[simplified]{pgf-umlcd}
+\renewcommand{\umldrawcolor}{black}
+
+\begin{document}
+
+\title{Relatório do Trabalho Prático de LI3}
+\author{Grupo 42\\
+\\
+João Queirós (A82422)\\
+\\
+José Costa (A82136)\\
+\\
+Luís Alves (A80165)\\
+\\
+Miguel Carvalho (A81909)}
+\date{\today}
+
+\maketitle
+\tableofcontents
+
+\section{Introdução}
+
+	\subsection{Contextualização}
+		\tab Este projeto foi desenvolvido no âmbito da Unidade Curricular
+		de \textit{Laboratórios de Informática III}, no qual analisaremos e processaremos
+		informação do \href{https://pt.stackoverflow.com}{\textit{\textbf{Stack Overflow}}},
+		\href{https://android.stackexchange.com}{\textit{\textbf{Android}}} e
+		\href{https://askubuntu.com}{\textit{\textbf{Ask Ubuntu}}}, recorrendo
+		à linguagem de programação Java.
+
+
+	\subsection{Objetivos}
+		\tab Após realizarmos o trabalho em C, propusemo-nos a melhorar a modularização
+		deste, tal como reduzir ao mínimo as interdependências entre classes.
+		\par Ainda assim, tivemos sempre em mente a obtenção de reduzidos tempos de resposta
+		para cada \textit{query}.
+
+\section{Estrutura de Dados}
+	\tab De forma a organizarmos as nossas classes pelos packages previamente criados,
+	optamos por colocar os tipos básicos de dados no package \texttt{li3}, assim como
+	as interfaces que definiam métodos a implementar pela classe que armazenasse os
+	dados da aplicação (\texttt{Community}).
+	\par Criamos um package extra \texttt{exceptions} onde colocamos, naturalmente,
+	algumas exceptions que criamos para o projeto.
+	\par No package \texttt{common}, colocamos todos os \textit{Comparators} usados
+	nas diversas classes, enquanto que no package \texttt{engine} colocamos a classe
+	de parsing (\texttt{Parser}), as classes respetivas a cada \textit{query}, bem como a
+	classe que implementa a \texttt{TADCommunity} (\texttt{ForumsModel}) e a classe
+	que funciona como base de dados da aplicação (\texttt{Community}).
+
+	\subsection{Tipos Básicos}
+
+		\begin{figure}
+			\centering
+
+		\begin{tikzpicture}
+			\begin{interface}[text width = 3cm]{Identifiable}{8,-3}
+				\attribute{public long getId()}
+			\end{interface}
+
+			\begin{class}[text width = 2cm]{Post}{2,-3}
+				\implement{Identifiable}
+			\end{class}
+
+			\begin{class}[text width = 2cm]{Question}{0,0}
+				\inherit{Post}
+			\end{class}
+
+			\begin{class}[text width = 2cm]{Answer}{4,0}
+				\inherit{Post}
+			\end{class}
+
+			\begin{class}[text width = 2cm]{Tag}{8,0}
+				\implement{Identifiable}
+			\end{class}
+
+			\begin{class}[text width = 2cm]{User}{12,0}
+				\implement{Identifiable}
+			\end{class}
+
+
+		\end{tikzpicture}
+		\caption{Diagrama dos Tipos Básicos} \label{diag:basic}
+		\end{figure}
+
+		\subsubsection{Post}
+			\tab Um \texttt{Post} é um objeto simples que contém informações comuns a \texttt{Question}
+			e a \texttt{Answer}: título, id, data de criação e id do criador. Este objeto
+			é a superclasse das classes acima referidas.
+
+		\subsubsection{Question}
+			\tab Uma \texttt{Question} é subclasse de \texttt{Post}, e contém uma lista
+			com os nomes das tags dessa questão bem como o atributo \textit{AnswerCount}.
+
+		\subsubsection{Answer}
+			\tab Uma \texttt{Answer} é subclasse de \texttt{Post}, e contém várias informações
+			adicionais relativamente a este: id da questão que responde, o seu score e o nº
+			de comentários.
+
+		\subsubsection{Tag}
+			\tab Uma \texttt{Tag} é um objeto que define os tipos de tags que uma questão
+			pode ter, por isso contém: o nome da tag e o id associado.
+
+		\subsubsection{User}
+			\tab Um \texttt{User} é um objeto que representa um utilizador no sistema, e contém
+			as seguintes informações: uma pequena bio, nome, id, reputação e nº de posts.
+
+	\subsection{Armazenamento de Dados}\label{sec:community}
+		\tab De forma a posteriormente podermos consultar os dados de forma eficiente,
+		optou-se por não criar clones dos objetos indiscriminadamente, já que estes,
+		após serem carregados, não seriam mais alterados, já que todas as queries são
+		meramente de consulta. Isto permitiu uma poupança significativa na memória ocupada,
+		bem como no trabalho extra que seria necessário por parte do CPU para clonar todos
+		os objetos. Ainda assim, consideramos que os dados ficam devidamente encapsulados,
+		já que apenas permitimos o acesso via métodos públicos com um comportamento bem
+		definido (as variáveis de instância permanecem privadas).
+		\par Assim sendo, criamos uma classe \texttt{Community} que agrega os dados
+		da seguinte forma:
+			\begin{itemize}
+				\item Map de id para \texttt{User}
+				\item Map de id para \texttt{Post}
+				\item Map de id de uma \texttt{Question} para um Set de \texttt{Answer} (ordenado por ordem
+				cronológica inversa)
+				\item Map de id de um \texttt{User} para um Set de \texttt{Post} (ordenado por ordem
+				cronológica inversa)
+				\item Lista de \texttt{User} ordenado por ordem decrescente de nº de \texttt{Post}
+				\item TreeMap de \texttt{LocalDateTime} para um Set de \texttt{Post}, ordenado por ordem
+				cronológica inversa
+				\item Map de nome de uma \texttt{Tag} para a respetiva \texttt{Tag}
+			\end{itemize}
+		\par Os Maps foram usados de forma a obter em tempo constante um determinado objeto/conjunto
+		de objetos de acordo com o seu identificador. Quanto à lista, esta foi usada pois, aquando
+		do momento de \textit{Loading}, colocamos primeiro os utilizadores na \texttt{Community}. No
+		entanto, não sabemos \textit{à priori}, o seu número de posts. Por isso, esse número é apenas
+		incrementado quando procedemos ao carregamento dos posts. Findo esse carregamento, podemos
+		usar um \textit{Comparator} na Lista, de forma a ordenarmos por número de posts.
+		\par Quanto ao TreeMap, este foi usado por disponibilizar o método \texttt{subMap} que
+		se revelou muito eficiente na obtenção de posts entre determinados intervalos de tempo.
+
+
+\section{Carregamento de Dados}
+	\subsection{Parsing}
+		\tab Para efetuarmos o parsing dos ficheiros .xml, optamos por usar a
+		\textit{Streaming API for XML} (StAX), já que permitia não carregar o ficheiro
+		.xml todo para memória, mas sim carregar "row a row", uma melhoria relativamente
+		ao parsing feito em C.
+		\par Para isso, criamos uma classe \texttt{Parser} que apenas possui métodos
+		de classe, para retirar informação útil dos ficheiros \textit{Posts.xml}, \textit{Users.xml}
+		e \textit{Tags.xml}, devolvendo listas com o conteúdo de acordo com os respetivos
+		objetos (\texttt{Post}, \texttt{User} e \texttt{Tag}).
+
+	\subsection{Loading}
+		\tab Ao efetuarmos o \textit{loading} dos ficheiros, limitamo-nos a pegar nas listas resultantes
+		dos métodos de classe da classe \texttt{Parser}, e a colocar cada um desses objetos
+		no objeto \texttt{Community}. Ora esse objeto possui um conjunto de métodos (privados)
+		que relacionam os posts, users e tags de acordo com as variáveis de instância definidas
+		(ver secção \ref{sec:community}).
+		\par O \textit{loading} dos ficheiros é feito pela seguinte ordem: primeiro são
+		armazenados os users, depois as tags e por fim os posts.
+
+\section{Modularização}
+	\tab De forma a ser possível desenvolver o código concorrentemente pelos 4 elementos
+	do grupo, optamos por partir o problema o máximo possível para não haver interdependências ou,
+	havendo-as, serem minimizadas, nomeadamente através da definição de interfaces que sinalizavam
+	métodos que posteriormente deveriam ser implementados para completar a funcionalidade de uma
+	determinada \textit{query}. Assim sendo, cada \textit{query} também tem a sua própria classe com
+	métodos de classe que trabalham sobre os dados disponibilizados pela \texttt{Community}.
+	\par Tendo isto em consideração, criamos os seguintes módulos fundamentais, que poderiam
+	ser desenvolvidos simultaneamente:
+		\begin{itemize}
+			\item Parsing dos ficheiros XML
+			\item Tipos básicos
+			\item Definição da estrutura que albergasse os dados e métodos de disponibilização
+			desses mesmos dados
+			\item Queries
+		\end{itemize}
+
+\section{Queries}
+	\subsection{InfoFromPost (1)}
+		\tab Utilizando o método \texttt{getPost()} que recebe como argumento o id do \texttt{Post}
+		que queremos consultar no objeto \texttt{Community} que contém os dados (daqui em diante
+		todos os métodos chamados a um objeto não seja explicitado, assumem-se que sejam chamados
+		ao \texttt{Community}).
+		\par Caso seja devolvido um \texttt{Post}, verifica-se se é uma \texttt{Answer} ou \texttt{Question},
+		pois se for a primeira, o título e nome devolvidos são os da questão e criador respetivos; se for a
+		segunda, é devolvido o título e nome da resposta e do criador da resposta. Caso o \texttt{Post} não exista,
+		ou não possua título/nome, é passado null como resultado ao \texttt{Pair}.
+
+	\subsection{TopMostActive (2)}
+	 \tab Utilizando o método \texttt{getUsersByNumberOfPosts()} que recebe como argumento
+	 o número de utilizadores, os \texttt{User} são transformados no seu respetivo id e é
+	 devolvida a lista com esses ids. O método primeiramente referenciado, limita-se a
+	 passar para uma nova lista de tamanho máximo N a lista ordenada de utilizadores
+	 de acordo com o número de posts. Refere-se novamente que, por não se alterar
+	 o objeto, se passa a referência ao objeto que está guardado na \texttt{Community}.
+
+	\subsection{TotalPosts (3)}
+		\tab Nesta \textit{query}, inicialmente havíamos pensado em implementar uma estratégia
+		que minimizasse o uso de computações específicas à \textit{query} dentro da classe \textit{Community}.
+		Assim sendo, optamos por obter a lista de posts dentro de um intervalo e, posteriormente,
+		iterá-la e contar se eram instâncias de \texttt{Question}, ou de \texttt{Answer}. No entanto, isto implicava
+		que percorrêssemos essa lista de posts mais que uma vez. Optamos por uma outra abordagem, que se enuncia de seguida.
+		\par Sendo o tempo de execução obtido demasiado elevado, optamos por, ao coletar os posts dentro
+		de um intervalo na classe \texttt{Community}, contar de imediato se eram uma \texttt{Question}, ou uma \texttt{Answer}. Verificou-se um aumento
+		de performance na ordem das 4 vezes (análise mais detalhada na secção \ref{ch:otimizacao}).
+
+	\subsection{QuestionsWithTag (4)}
+		\tab Inicialmente, utilizamos o método \texttt{filterQuestionByInterval()} que recebe
+		como argumentos as datas de início e de fim da \textit{query} de forma a obtermos
+		uma lista com \texttt{Question}s feitas nesse intervalo. De seguida, usando uma \texttt{stream},
+		filtramos as questões de forma a de seguida podermos ordenar as que contêm a tag dada
+		por ordem cronológica inversa.
+
+	\subsection{GetUserInfo (5)}
+		\tab Sendo esta \textit{query} bastante simples, a nossa estratégia passou por
+		obter a bio de um utilizador através do método \texttt{getBio()}, que dado um id,
+		verifica se o utilizador existe na \texttt{Community} e, se existir devolve a sua bio.
+		Caso não exista, ou não possua bio, devolve \textit{null}.
+		\par Quanto aos 10 últimos posts, recorrendo ao método \texttt{get10LatestPosts()} que devolve
+		os 10 posts mais recentes de um utlizador dado o seu id, obtemos uma lista com os respetivos posts, já que
+		armazenamos para cada utilizador, um Set já ordenado por ordem cronológica inversa dos seus
+		posts.
+
+	\subsection{MostVotedAnswers (6)}
+		\tab Utilizando o método \texttt{filterAnswerByInterval()}, que recebe um intervalo
+		de tempo e devolve todas as \texttt{Answers} feitas nesse período, apenas necessitamos
+		de, recorrendo a uma \texttt{stream}, utilizar o método \texttt{sorted()} de acordo
+		com um comparador de \texttt{Answers} por \textit{score} e limitar o tamanho
+		da stream a N. É por fim coletada para uma lista de ids das \texttt{Answers}.
+
+	\subsection{MostAnsweredQuestions (7)}
+		\tab Inicialmente utilizamos o método \texttt{filterQuestionByInterval()} que, tal como
+		os métodos com nome similar usados anteriormente, devolve uma lista com as questões
+		realizadas no intervalo de tempo dado como argumento.
+		De seguida, iteramos todas essas questões e colocamos num HashMap o id de cada questão
+		como chave, e o número de respostas como valor. De seguida, fazemos \texttt{stream}
+		do entrySet e usando o comparator \texttt{ComparatorLongIntEntryReverseInt} (que, dadas
+		duas entries, devolve a com maior valor em primeiro lugar, e se os valores forem iguais, coloca
+		a que tem maior key em primeiro lugar) ordena-se a stream limitando-a a N e coletando
+		os ids das questões para uma lista.
+
+	\subsection{ContainsWord (8)}
+		\tab Para esta \textit{query}, utilizamos uma versão do método \texttt{filterQuestionByInterval()}
+		que não recebe nenhum argumento e, por isso, retorna todas as questões presentes na
+		\texttt{Community}. De seguida, utilizando uma \texttt{stream}, filtram-se as questões
+		que contêm um título que não seja nulo e que contenha a palavra passada como argumento
+		da \textit{query}, recorrendo ao método \texttt{contains()} da classe \texttt{String}.
+		\par De seguida, é feita uma ordenação por ordem cronológica inversa limitada a N
+		e são coletados os ids das questões para uma lista.
+
+
+	\subsection{BothParticipated (9)}
+		\tab Para solucionarmos esta \textit{query}, criamos dois sets: um para as questões
+		em que participou o \texttt{User} 1, e outro para o \texttt{User} 2. As questões
+		nas quais cada \texttt{User} participou são dadas pelo método \texttt{getQuestions()},
+		que dado um id, devolve um set (que pode ser vazio) das questões nas quais um utilizador
+		interveio, quer tenha sido via \texttt{Question}, ou \texttt{Answer}.
+		\par De seguida, colocamos em \texttt{stream} o set de questões do \texttt{User} 1 e
+		filtramos aqueles que também fazem parte do set de questões do \texttt{User} 2, através
+		do método \texttt{contains()} da classe \texttt{Set}. De seguida, ordenam-se as questões
+		por id e limita-se o tamanho a N, coletando os ids das questões numa lista.
+
+	\subsection{BetterAnswer (10)}
+		\tab Começamos a solucionar esta \textit{query} obtendo o set de respostas de uma
+		dada pergunta através do método \texttt{getAnswers()}. A partir daí, para cada
+		resposta é calculado o seu valor e adicionado a um TreeMap, que associa a cada
+		\textit{score}, um set de ids de \texttt{Answer}, ordenado por ordem decrescente.
+		\par Por fim, retira-se o valor à cabeça do TreeMap e é o id pretendido.
+
+	\subsection{MostUsedBestRep (11)}
+		\tab Sendo esta a \textit{query} mais complexa (e que mais dados necessita de cruzar), foi
+		a que conseguimos um pior tempo de execução. O processo para obter o resultado é o que se
+		enuncia a seguir.
+		\par Inicialmente, é obtido o Set de \texttt{Questions} que foram publicadas no intervalo dado.
+		A partir desse Set, foi criada uma lista de \texttt{Users} num método auxiliar (\texttt{usersThatParticipated()})
+		que publicaram esses \texttt{Posts}, sendo depois essa Lista ordenada por reputação e truncada a N.
+		\par Tendo já a lista final de N utilizadores com melhor reputação, por cada utilizador nessa lista,
+		obtemos o Set de posts desse \texttt{User}, sendo que caso o \texttt{Post} seja uma
+		\texttt{Question} e o primeiro Set de \texttt{Posts} obtido contiver este \texttt{Post},
+		então é adicionado o id da \texttt{Tag} e o número de vezes que foi usada a um
+		HashMap.
+		\par Por fim, as \textit{entries} desse Map são colocadas em \texttt{stream} e
+		ordenadas de acordo com os valores (e, caso os valores sejam iguais, por ordem
+		crescente de ids), sendo coletados os ids para uma lista truncada a N.
+
+\section{Análise de Performance}\label{ch:otimizacao}
+	\tab Num computador portátil com 8GiB de RAM e um processador Intel® Core™ i7-3630QM @ 2.40GHz com
+	8 cores,
+	obtivemos os mesmos resultados que os de referência (atualização 3), tendo registado
+	os tempos na tabela abaixo.
+
+	\begin{table}[]
+		\label{tab:times}
+		\centering
+
+		\begin{tabular}{c|c|c|}
+		\cline{2-3}
+		& \multicolumn{2}{c|}{Tempos} \\ \hline
+		\multicolumn{1}{|c|}{Queries} & Parâmetro 1 & Parâmetro 2 \\ \hline
+		\multicolumn{1}{|c|}{1} & 0ms & 1ms \\ \hline
+		\multicolumn{1}{|c|}{2} & 7ms & 7ms \\ \hline
+		\multicolumn{1}{|c|}{3} & 7ms & 25ms \\ \hline
+		\multicolumn{1}{|c|}{4} & 28ms & 25ms \\ \hline
+		\multicolumn{1}{|c|}{5} & 1ms & 1ms \\ \hline
+		\multicolumn{1}{|c|}{6} & 14ms & 7ms \\ \hline
+		\multicolumn{1}{|c|}{7} & 7ms & 68ms \\ \hline
+		\multicolumn{1}{|c|}{8} & 148ms & 120ms \\ \hline
+		\multicolumn{1}{|c|}{9} & 3ms & 2ms \\ \hline
+		\multicolumn{1}{|c|}{10} & 1ms & 1ms \\ \hline
+		\multicolumn{1}{|c|}{11} & 25ms & 145ms \\ \hline
+		\end{tabular}
+		\caption{Tempos registados}
+	\end{table}
+
+	\par Para além disso, notamos algumas diferenças quando implementamos diferentes
+	abordagens nalgumas \textit{queries}.
+	\par Na \textit{query} 3, em vez de pedirmos os posts entre datas por parte
+	da nossa TCD, e depois iterá-los e verificar se eram \texttt{Question} ou \texttt{Answer},
+	optamos por na própria \texttt{Community}, ao recolher os posts, devolver imediamente
+	o par indicativo do número de perguntas e de respostas. Isto permitiu passar de 100ms,
+	para 25, no parâmetro 2.
+	\par Quanto às \textit{queries} que necessitavam de posts dentro de um dado intervalo,
+	inicialmente havíamos optado por guardar esses posts num Set ordenado por data. No entanto,
+	obter um subconjunto não se revelou muito eficiente, e por isso optamos por usar um
+	TreeMap, que graças ao método \texttt{submap} permitia obter o range desejado
+	mais rapidamente. Após implementarmos esta mudança na \texttt{Community}, verificamos
+	que o tempo de execução de cada \textit{query} que requeria posts dentro de um intervalo
+	diminui para cerca de 1/6 do tempo original com um Set.
+	\par Uma nota também para o facto de a \textit{query} 8 ser a mais demorada, já que
+	não organizamos o título de cada post de uma forma específica (dicionário, por exemplo)
+	de forma a consultar se a palavra estava contida no título de forma ainda mais eficiente.
+
+	\section{Conclusão}
+		\tab Após a conclusão deste projeto, verificamos que este ficou com muito menos
+		interdependências que o anterior em C. Para além disso, durante o desenvolvimento,
+		notamos que este podia ser feito mais concorrentemente sem tantos problemas de
+		\textit{merge}. Assim sendo, pensamos que cumprimos o planeado, tendo obtido
+		bons tempos de execução em cada \textit{query}, boa modularização e código
+		simples de modificar e fazer manutenção.
+
+\end{document}

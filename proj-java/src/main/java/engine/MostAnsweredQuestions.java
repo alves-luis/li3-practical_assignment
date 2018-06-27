@@ -10,19 +10,26 @@ import java.util.Set;
 import java.time.LocalDate;
 import java.util.HashMap;
 
+/**
+ * MostAnsweredQuestions class, stands for Query 7
+ *
+ * @author Grupo 42
+ * @version 2018-06-11
+ */
 public class MostAnsweredQuestions {
   /**
     * @param N size
     * @param begin LocalDate that begins
     * @param end LocalDate of ending
+    * @param com Community
+    * @return list with the ids of the questions
   */
   public static List<Long> mostAnsweredQuestions(int N, LocalDate begin, LocalDate end, Community com) {
     List<Question> questions = com.filterQuestionByInterval(begin,end);
     HashMap<Long,Integer> result = new HashMap<>();
     for(Question question : questions) {
-      long questionID = question.getId();
-      int count = question.getAnswerCount();
-      result.put(questionID,count);
+      Long questionID = question.getId();
+      result.put(questionID,com.getAnswers(questionID).size());
     }
     return result.entrySet().stream()
     .sorted(new ComparatorLongIntEntryReverseInt())

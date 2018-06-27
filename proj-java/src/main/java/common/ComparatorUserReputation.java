@@ -3,9 +3,10 @@ package common;
 import li3.User;
 
 /**
-  * Comparator of Users by Reputation (Mosts posts first)
+  * Comparator of Users by Reputation (biggest rep first)
+  * biggest id first then
   *
-  * @author Luís Alves
+  * @author Grupo 42
   * @version 2018-05-23
 */
 import java.util.Comparator;

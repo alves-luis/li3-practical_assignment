@@ -5,7 +5,7 @@ import li3.Answer;
 /**
   * Comparator of Answers by Score
   *
-  * @author Luís Alves
+  * @author Grupo 42
   * @version 2018-05-23
 */
 import java.util.Comparator;

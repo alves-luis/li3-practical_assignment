@@ -8,9 +8,17 @@ import common.MyLog;
 import common.Pair;
 import engine.ForumsModel;
 
+/**
+  * Main class, as teachers provided
+  * @author Teachers
+  * @version 12-05-2018
+*/
 public class Main {
 
-
+    /**
+      * Where the magic happens
+      * @param args arguments
+    */
     public static void main(String[] args){
 
         /*
@@ -33,6 +41,7 @@ public class Main {
         logtime.writeLog("LOAD -> "+(after-before)+" ms");
         } catch(IndexOutOfBoundsException e){
             System.out.println("Deve passar o caminho do dump como argumento.");
+            return;
         }
 
         /*
@@ -67,8 +76,8 @@ public class Main {
            Query 4
         */
         before = System.currentTimeMillis();
-        List<Long> query4 = qe.questionsWithTag("package-management", LocalDate.of(2013, Month.MARCH, 1),
-                LocalDate.of(2013, Month.MARCH,31));
+        List<Long> query4 = qe.questionsWithTag("nautilus", LocalDate.of(2014, Month.JANUARY, 1),
+                LocalDate.of(2014, Month.JANUARY,31));
         after = System.currentTimeMillis();
         logtime.writeLog("Query 4 -> " + (after - before) + " ms");
         log.writeLog("Query 4 -> " + query4);
@@ -106,7 +115,7 @@ public class Main {
            Query 8
         */
         before = System.currentTimeMillis();
-        List<Long> q8 = qe.containsWord(10, "kde");
+        List<Long> q8 = qe.containsWord(10, "glib");
         after = System.currentTimeMillis();
         logtime.writeLog("Query 8 -> " + (after - before) + " ms");
         log.writeLog("Query 8 -> " + q8);
@@ -133,8 +142,8 @@ public class Main {
             Query 11
         */
         before = System.currentTimeMillis();
-        List<Long> q11 = qe.mostUsedBestRep(5, LocalDate.of(2013,Month.NOVEMBER,01),
-                LocalDate.of(2013,Month.NOVEMBER,30));
+        List<Long> q11 = qe.mostUsedBestRep(10, LocalDate.of(2014,Month.JANUARY,1),
+                LocalDate.of(2014,Month.DECEMBER,31));
         after = System.currentTimeMillis();
         logtime.writeLog("Query 11 -> "+(after-before)+" ms");
         log.writeLog("Query 11 -> "+q11);
@@ -146,7 +155,6 @@ public class Main {
         qe.clear();
         after = System.currentTimeMillis();
         logtime.writeLog("CLEAN -> "+(after-before)+" ms");
-
     }
 
 }

@@ -29,6 +29,11 @@ import exceptions.UserDoesNotExistException;
 import exceptions.UserDoesNotHaveBioException;
 import exceptions.PostDoesNotExistException;
 
+/**
+  * Class where all the data is stored
+  * @author Grupo 42
+  * @version 2018-12-06
+*/
 public class Community implements MostActive, BaseInfo, Filters {
 
   /** They all share pointers */
@@ -185,7 +190,7 @@ public class Community implements MostActive, BaseInfo, Filters {
     * @see li3.Answer
   */
   public List<Answer> filterAnswerByInterval(LocalDate begin, LocalDate end) {
-    Collection<Set<Post>> col = this.postsByDate.subMap(LocalDateTime.of(begin,LocalTime.MIN),true,LocalDateTime.of(end,LocalTime.MAX),true).values();
+    Collection<Set<Post>> col = this.postsByDate.subMap(LocalDateTime.of(begin,LocalTime.MIN),LocalDateTime.of(end,LocalTime.MAX)).values();
     if (col == null) return new ArrayList<>();
     else
       return col.stream()
@@ -326,8 +331,9 @@ public class Community implements MostActive, BaseInfo, Filters {
     * @param u User to insert
   */
   private void insertUser(User u) {
-    this.usersById.put(u.getId(),u);
-    this.usersByNumberOfPosts.add(u);
+    User clonedUser = u.clone();
+    this.usersById.put(u.getId(),clonedUser);
+    this.usersByNumberOfPosts.add(clonedUser);
   }
 
   /**
@@ -335,7 +341,8 @@ public class Community implements MostActive, BaseInfo, Filters {
     * @param t Tag to insert
   */
   private void insertTag(Tag t) {
-    this.tagsByName.put(t.getName(),t);
+    Tag clonedTag = t.clone();
+    this.tagsByName.put(clonedTag.getName(),clonedTag);
   }
 
   /**

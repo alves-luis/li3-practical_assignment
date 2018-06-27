@@ -1,12 +1,11 @@
 package li3;
 
 /**
- * Escreva a descrição da interface Identifiable aqui.
+ * Identifiable interface
  *
- * @author (seu nome)
+ * @author Grupo 42
  * @version 2015-05-23
  */
-
 public interface Identifiable {
   /** Getter for an Id */
   public long getId();

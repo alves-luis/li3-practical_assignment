@@ -4,6 +4,12 @@ import java.time.LocalDate;
 import java.util.List;
 import common.Pair;
 
+/**
+ * TAD Community interface containing all the queries
+ *
+ * @author Grupo 42
+ * @version 2018-05-23
+ */
 public interface TADCommunity {
     public void load(String dumpPath);
 

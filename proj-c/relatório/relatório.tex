@@ -64,16 +64,7 @@ Miguel Carvalho A81909}
 	 Para correr o ciclo que passa pelos N utilizadores mais ativos é calculada a variável \verb+maxSize+ que, claro está, será o tamanho da lista de utilizadores devolvida. Lista essa que é gerada retirando ordenadamente da \textit{Heap} cada utilizador, encontrando o seu ID e inserindo-o por fim na lista referida. Após todas as iterações é libertado o espaço ocupado pela \textit{Heap} através da função \verb+heap_free+.
 
 	\section{Query 3}
-		\tab Nesta Query, inicialmente havíamos pensado em implementar uma estratégia
-		que minimizasse o uso de computações específicas à query dentro da classe \textit{Community}.
-		Assim sendo, optamos por opter a lista de Posts dentro de um intervalo e, posteriormente,
-		iterá-la e contar se eram instâncias de Pergunta, ou de Resposta. No entanto, isto implicava
-		que percorressemos essa Lista de Posts mais que uma vez. Optamos por outra abordagem, que se enuncia de seguida.
-		\par Considerando o valor obtido de execução demasiado elevado, optamos por, ao coletar os Posts dentro
-		de um intervalo, contar de imediato se eram uma Pergunta, ou uma Resposta. Verificou-se um aumento
-		de performance na ordem das 4 vezes (análise mais detalhada na secção \ref{ch:otimizacao}).
-		\par Apesar de esta computação se realizar no objeto \textit{Community}, em termos arquiteturais faz sentido,
-		pelo que mantivemos esta abordagem tanto pela performance, como pela coerência arquitetural.
+	\tab Começamos por criar um \textit{Long Pair} (0, 0) para contar o número de perguntas e respostas e criamos a sequência com todos os posts. A seguir, chamamos a função \verb+seq_inBetweenDates+, que vai aplicar uma função a todos os posts entre as datas recebidas. Essa função vai verificar se os posts são perguntas ou respostas, e incrementa o contador em conformidade. 
 
 	\section{Query 4} -M
 	\tab Os posts são guardados numa \textit{Hash Table}. Utilizamos a função  \verb+seq_inBetweenDates+ que vai aplicar uma função a todos os posts da Hash entre as duas datas. A função vai inserir os posts dinamicamente numa lista caso estes sejam perguntas e contenham a tag fornecida. No final de todos os posts serem inseridos,  o espaço não ocupado é libertado e a lista é invertida.
@@ -102,11 +93,11 @@ Miguel Carvalho A81909}
 
 	\section{Query 10}
 	\tab É encontrado o \textit{Post} procurando numa \textit{Hash table} o ID da pergunta. São então percorridas todas as respostas à pergunta e, para cada uma delas, é calculado o seu \textit{score}. Através de um algoritmo de cálculo de elemento máximo, é colocado na variável a ser devolvida pela função o ID da resposta.
-
+ 
 	\section{Query 11}
 	\tab Retiramos da heap dos users os N melhores qualificados e colocamo-los numa lista. Chamamos a função \verb+seq_inBetweenDates+  que aplica uma função a cada post entre as datas recebidas. A função verifica se o post pertence a um dos N utilizadores e caso pertença aplica uma outra função ás tags que a associa ao seu ID e insere-o numa Hash que, a cada ID(key) associa um contador, e caso o ID já exista, incrementa o contador da respetiva tag. Finalmente, percorremos a hash e inserimo-los por ordem decrescente de aparências na lista a retornar.
 
-\chapter{Estratégias de otimização}\label{ch:otimizacao}
+\chapter{Estratégias de otimização}
 	\tab Não foi utilizada nenhuma API para melhorar e influenciar os tempos de execução das \textit{Queries} (como por exemplo o \href{http://www.openmp.org/}{\textit{\textbf{OpenMP}}}. \par
 	Desde cedo que o grupo se focou em criar estruturas de dados com complexidade linear ou logarítmica(\textit{Hash tables} e \textit{AVL Trees}) de modo a manter sempre um bom desempenho na execução das funções criadas. Beneficiamos também das implementações já construídas fornecidas pelo \href{https://developer.gnome.org/glib/}{\textit{\textbf{GLib}}} (como foi dito anteriormente) que contribuíram para a implementação de todo o código com um desempenho considerável.
 	Deste modo, toda a otimização feita pelo grupo baseou-se em gerir o código da maneira mais limpa possível, como retirando qualquer tipo de \textit{"ciclos encavalitados"} que geram complexidades polinomiais e evitando a cópia de conteúdo, ou seja, trabalhando sobretudo com \textit{pointers}.

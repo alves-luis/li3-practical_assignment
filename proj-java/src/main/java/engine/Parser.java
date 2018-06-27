@@ -1,18 +1,24 @@
 package engine;
 
-import li3.*;
+import li3.Answer;
+import li3.Post;
+import li3.Question;
+import li3.Tag;
+import li3.User;
 
 /**
- * Escreva a descrição da classe Parser aqui.
+ * Class with the methods to parse xml into our TCD
  *
  * @author Grupo 42
  * @version 2018-05-23
  */
 
 import java.io.FileReader;
-import javax.xml.stream.*;
 import java.io.FileInputStream;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +27,12 @@ import java.util.Arrays;
 
 public class Parser {
 
+  /**
+    * Method that given a file name, parses the file into a List of Posts
+    * @param file filename
+    * @return list with the posts
+    * @see li3.Post
+  */
   public static List<Post> parsePost(String file) {
     ArrayList<Post> result = new ArrayList<>();
     try {
@@ -68,6 +80,8 @@ public class Parser {
 
   /**
     * Parses the tags with <tag><tag2> format to a List of Tag
+    * @param tags with default format
+    * @return all trimmed, in a list, pretty nice
   */
   private static List<String> trimTags(String tags) {
     String withoutEnds = tags.substring(1,tags.length()-1);
@@ -75,6 +89,11 @@ public class Parser {
     return Arrays.asList(tokens);
   }
 
+  /**
+    * Method that given a filename, returns a list with the tags parsed
+    * @param file file to be parsed
+    * @return Returns a list with the tags all nice
+  */
   public static List<Tag> parseTag(String file) {
     ArrayList<Tag> result = new ArrayList<>();
     try {
@@ -102,6 +121,11 @@ public class Parser {
     return result;
   }
 
+  /**
+    * Method that given a filename, parses it to a list of users
+    * @param file filename
+    * @return List with the users all parsed out
+  */
   public static List<User> parseUser(String file) {
     ArrayList<User> result = new ArrayList<>();
     try {
@@ -131,6 +155,11 @@ public class Parser {
     return result;
   }
 
+  /**
+    * verify beggining of each element in xml file
+    * @param name content
+    * @return if equals "row"
+  */
   private static boolean isRow(String name) {
     return name.equals("row");
   }

@@ -1,0 +1,8 @@
+*.bluej
+*.ctxt
+*.class
+*.ctxt
+*.class
+proj-c/src/XML Files/android/.DS_Store
+*.xml
+proj-c/src/XML Files/ubuntu/.DS_Store

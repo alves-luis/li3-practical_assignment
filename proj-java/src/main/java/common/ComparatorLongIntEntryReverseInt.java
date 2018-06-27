@@ -3,9 +3,9 @@ package common;
 import java.util.Map;
 
 /**
-  * Comparator of Map.Entries of <Long,Integer> (second order is Bigger Integer first)
+  * Comparator of Map.Entries of <Long,Integer> (second order is Bigger Long first)
   *
-  * @author Luís Alves
+  * @author Grupo 42
   * @version 2018-05-23
 */
 import java.util.Comparator;
