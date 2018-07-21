@@ -1,5 +1,7 @@
 # Laboratório de Informática 3 (LI3)
 
+Nota-final: 18
+
 ## proj-c
 
 Repositório com ficheiros comuns a todos os projetos.
@@ -11,6 +13,7 @@ Estrutura do repositório:
 - pasta `src/lib`: contém as definições dos tipos que constam na definição da interface do programa
 - pastas `src/obj` e `src/obj/lib`: conterão os ficheiros `.o` quando o programa for compilado
 
+Nota da Fase 1: 16
 
 ## proj-java
 
@@ -29,4 +32,6 @@ Para compilar o projeto e corrê-lo com a *class* **Main** fornecida, deve-se ex
 ```bash
 ./run.sh [DUMP_PATH]
 ```
+
+Nota da Fase 2: 20
 
