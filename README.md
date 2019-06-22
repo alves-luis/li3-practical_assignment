@@ -3,8 +3,8 @@ This repo contains code made for the practical assignment of the Computer Labs I
 
 Team members:
 * [Luís Alves](https://github.com/alves-luis)
-* [Miguel Carvalho] (https://github.com/MAACarvalho)
-* [José Costa] (https://github.com/DeusTaNoComando)
+* [Miguel Carvalho](https://github.com/MAACarvalho)
+* [José Costa](https://github.com/DeusTaNoComando)
 * [João Queirós](https://github.com/JoaoQueiros)
 
 Final grade: 18
