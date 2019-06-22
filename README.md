@@ -1,6 +1,13 @@
-# Laboratório de Informática 3 (LI3)
+# LI3 - Practical Assignment
+This repo contains code made for the practical assignment of the Computer Labs III course in the University of Minho.
 
-Nota-final: 18
+Team members:
+* [Luís Alves](https://github.com/alves-luis)
+* [Miguel Carvalho] (https://github.com/MAACarvalho)
+* [José Costa] (https://github.com/DeusTaNoComando)
+* [João Queirós](https://github.com/JoaoQueiros)
+
+Final grade: 18
 
 ## proj-c
 
